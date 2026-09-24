@@ -1,0 +1,74 @@
+generator client {
+  provider            = "prisma-client"
+  output              = "../src/generated/prisma"
+  moduleFormat        = "esm"
+  importFileExtension = "js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum IndicatorSource {
+  BCB
+  FRED
+}
+
+enum IndicatorFrequency {
+  DAILY
+  MONTHLY
+}
+
+enum VariationStrategy {
+  PREVIOUS_OBSERVATIONS
+  PREVIOUS_CALENDAR_MONTH
+  PREVIOUS_CALENDAR_DAYS
+}
+
+model Indicator {
+  slug              String             @id
+  name              String
+  source            IndicatorSource
+  externalCode      String             @map("external_code")
+  frequency         IndicatorFrequency
+  unit              String
+  description       String
+  limitationText    String             @map("limitation_text")
+  sourceUrl         String             @map("source_url")
+  variationStrategy VariationStrategy  @map("variation_strategy")
+  variationPeriods  Int                @map("variation_periods")
+  historyMonths     Int                @map("history_months")
+  ttlMinutes        Int                @map("ttl_minutes")
+  lastSyncedAt      DateTime?          @map("last_synced_at") @db.Timestamptz(3)
+  createdAt         DateTime           @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt         DateTime           @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  observations Observation[]
+  favorites    Favorite[]
+
+  @@map("indicators")
+}
+
+model Observation {
+  indicatorSlug String   @map("indicator_slug")
+  referenceDate DateTime @map("reference_date") @db.Date
+  value         Decimal  @db.Decimal(20, 8)
+  createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt     DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  indicator Indicator @relation(fields: [indicatorSlug], references: [slug], onDelete: Restrict)
+
+  @@id([indicatorSlug, referenceDate])
+  @@map("observations")
+}
+
+model Favorite {
+  visitorId     String   @map("visitor_id") @db.Uuid
+  indicatorSlug String   @map("indicator_slug")
+  createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  indicator Indicator @relation(fields: [indicatorSlug], references: [slug], onDelete: Cascade)
+
+  @@id([visitorId, indicatorSlug])
+  @@map("favorites")
+}
