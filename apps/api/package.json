@@ -17,7 +17,8 @@
     "db:status": "prisma migrate status",
     "db:seed": "prisma db seed",
     "sync:ptax": "tsx src/jobs/sync-ptax.ts",
-    "sync:selic": "tsx src/jobs/sync-selic.ts"
+    "sync:selic": "tsx src/jobs/sync-selic.ts",
+    "sync:fred": "tsx src/jobs/sync-fred.ts"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.10.0",

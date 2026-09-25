@@ -16,24 +16,26 @@ dotenv.config({
   quiet: true,
 });
 
+export function requireJobEnvironmentVariable(name: string): string {
+  const value = process.env[name]?.trim();
+
+  if (!value) {
+    throw new Error(`${name} is required`);
+  }
+
+  return value;
+}
+
 export async function runIndicatorSync({
   slug,
   provider,
 }: RunIndicatorSyncOptions): Promise<void> {
-  const connectionString = process.env.DATABASE_URL;
-
-  if (!connectionString) {
-    throw new Error("DATABASE_URL is required");
-  }
+  const connectionString = requireJobEnvironmentVariable("DATABASE_URL");
 
   const database = createDatabaseClient(connectionString);
 
   try {
-    const result = await syncPersistedIndicator(
-      database,
-      slug,
-      provider,
-    );
+    const result = await syncPersistedIndicator(database, slug, provider);
 
     console.info({
       indicator: slug,
