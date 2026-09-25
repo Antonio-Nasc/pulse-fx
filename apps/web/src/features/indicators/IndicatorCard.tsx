@@ -11,6 +11,7 @@ type IndicatorCardProps = {
   favorite: boolean;
   favoriteDisabled: boolean;
   onToggleFavorite: () => void;
+  onOpenDetails: () => void;
 };
 
 const sourceLabels = {
@@ -23,6 +24,7 @@ export function IndicatorCard({
   favorite,
   favoriteDisabled,
   onToggleFavorite,
+  onOpenDetails,
 }: IndicatorCardProps) {
   const changeTone = getChangeTone(indicator.changePercent);
 
@@ -88,10 +90,20 @@ export function IndicatorCard({
       </div>
 
       <footer className="indicator-card__footer">
-        <span>Referência</span>
-        <strong>
-          {formatReferenceDate(indicator.referenceDate)}
-        </strong>
+        <div className="indicator-card__reference">
+          <span>Referência</span>
+          <strong>
+            {formatReferenceDate(indicator.referenceDate)}
+          </strong>
+        </div>
+
+        <button
+          className="indicator-card__details"
+          type="button"
+          onClick={onOpenDetails}
+        >
+          Ver histórico →
+        </button>
       </footer>
     </article>
   );

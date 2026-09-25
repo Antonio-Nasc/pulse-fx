@@ -1,12 +1,17 @@
-import { useState } from 'react';
+import { useState } from "react";
 
-import { useFavorites } from '../favorites/use-favorites';
-import { IndicatorCard } from './IndicatorCard';
-import { useIndicators } from './use-indicators';
+import { useFavorites } from "../favorites/use-favorites";
+import { IndicatorCard } from "./IndicatorCard";
+import { useIndicators } from "./use-indicators";
 
-type DashboardView = 'all' | 'favorites';
+type DashboardView = "all" | "favorites";
+type IndicatorsDashboardProps = {
+  onSelectIndicator: (slug: string) => void;
+};
 
-export function IndicatorsDashboard() {
+export function IndicatorsDashboard({
+  onSelectIndicator,
+}: IndicatorsDashboardProps) {
   const {
     indicators,
     loading: indicatorsLoading,
@@ -23,13 +28,11 @@ export function IndicatorsDashboard() {
     toggleFavorite,
   } = useFavorites();
 
-  const [view, setView] = useState<DashboardView>('all');
+  const [view, setView] = useState<DashboardView>("all");
 
   const visibleIndicators =
-    view === 'favorites'
-      ? indicators.filter((indicator) =>
-          isFavorite(indicator.slug),
-        )
+    view === "favorites"
+      ? indicators.filter((indicator) => isFavorite(indicator.slug))
       : indicators;
 
   return (
@@ -41,8 +44,8 @@ export function IndicatorsDashboard() {
           </span>
           <h1>O pulso dos mercados em um só lugar.</h1>
           <p>
-            Acompanhe referências do Brasil e dos Estados Unidos
-            com dados persistidos de fontes oficiais.
+            Acompanhe referências do Brasil e dos Estados Unidos com dados
+            persistidos de fontes oficiais.
           </p>
         </div>
 
@@ -52,10 +55,7 @@ export function IndicatorsDashboard() {
         </div>
       </section>
 
-      <section
-        className="dashboard-content"
-        aria-labelledby="indicators-title"
-      >
+      <section className="dashboard-content" aria-labelledby="indicators-title">
         <div className="dashboard-content__header">
           <div>
             <span className="section-label">Visão geral</span>
@@ -63,38 +63,33 @@ export function IndicatorsDashboard() {
           </div>
 
           <div className="dashboard-actions">
-            <div
-              className="dashboard-filter"
-              aria-label="Filtrar indicadores"
-            >
+            <div className="dashboard-filter" aria-label="Filtrar indicadores">
               <button
                 className={
-                  view === 'all'
-                    ? 'dashboard-filter__button dashboard-filter__button--active'
-                    : 'dashboard-filter__button'
+                  view === "all"
+                    ? "dashboard-filter__button dashboard-filter__button--active"
+                    : "dashboard-filter__button"
                 }
                 type="button"
-                aria-pressed={view === 'all'}
-                onClick={() => setView('all')}
+                aria-pressed={view === "all"}
+                onClick={() => setView("all")}
               >
                 Todos
               </button>
 
               <button
                 className={
-                  view === 'favorites'
-                    ? 'dashboard-filter__button dashboard-filter__button--active'
-                    : 'dashboard-filter__button'
+                  view === "favorites"
+                    ? "dashboard-filter__button dashboard-filter__button--active"
+                    : "dashboard-filter__button"
                 }
                 type="button"
-                aria-pressed={view === 'favorites'}
+                aria-pressed={view === "favorites"}
                 disabled={favoritesLoading}
-                onClick={() => setView('favorites')}
+                onClick={() => setView("favorites")}
               >
                 Meus indicadores
-                {!favoritesLoading && (
-                  <span>{favoriteSlugs.length}</span>
-                )}
+                {!favoritesLoading && <span>{favoriteSlugs.length}</span>}
               </button>
             </div>
 
@@ -117,10 +112,7 @@ export function IndicatorsDashboard() {
         )}
 
         {indicatorsLoading && (
-          <div
-            className="indicator-grid"
-            aria-label="Carregando indicadores"
-          >
+          <div className="indicator-grid" aria-label="Carregando indicadores">
             {[0, 1, 2].map((item) => (
               <div
                 className="indicator-card indicator-card--loading"
@@ -140,16 +132,12 @@ export function IndicatorsDashboard() {
           </div>
         )}
 
-        {!indicatorsLoading &&
-          !indicatorsError &&
-          indicators.length === 0 && (
-            <div className="dashboard-message">
-              <strong>Nenhum indicador disponível.</strong>
-              <p>
-                Execute a sincronização da API e tente novamente.
-              </p>
-            </div>
-          )}
+        {!indicatorsLoading && !indicatorsError && indicators.length === 0 && (
+          <div className="dashboard-message">
+            <strong>Nenhum indicador disponível.</strong>
+            <p>Execute a sincronização da API e tente novamente.</p>
+          </div>
+        )}
 
         {!indicatorsLoading &&
           !indicatorsError &&
@@ -158,8 +146,8 @@ export function IndicatorsDashboard() {
             <div className="dashboard-message">
               <strong>Você ainda não possui favoritos.</strong>
               <p>
-                Volte para “Todos” e marque os indicadores que
-                deseja acompanhar.
+                Volte para “Todos” e marque os indicadores que deseja
+                acompanhar.
               </p>
             </div>
           )}
@@ -173,11 +161,13 @@ export function IndicatorsDashboard() {
                   indicator={indicator}
                   favorite={isFavorite(indicator.slug)}
                   favoriteDisabled={
-                    favoritesLoading ||
-                    isPending(indicator.slug)
+                    favoritesLoading || isPending(indicator.slug)
                   }
                   onToggleFavorite={() => {
                     void toggleFavorite(indicator.slug);
+                  }}
+                  onOpenDetails={() => {
+                    onSelectIndicator(indicator.slug);
                   }}
                   key={indicator.slug}
                 />
