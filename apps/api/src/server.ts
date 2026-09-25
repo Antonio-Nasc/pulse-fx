@@ -7,11 +7,19 @@ import { BcbPtaxProvider } from "./modules/indicators/infrastructure/bcb-ptax-pr
 import { BcbSelicProvider } from "./modules/indicators/infrastructure/bcb-selic-provider.js";
 import { FredFundsProvider } from "./modules/indicators/infrastructure/fred-funds-provider.js";
 import { syncPersistedIndicator } from "./modules/indicators/infrastructure/sync-persisted-indicator.js";
+import { PrismaFavoriteRepository } from "./modules/favorites/infrastructure/prisma-favorite-repository.js";
 
 const database = createDatabaseClient(env.DATABASE_URL);
 const indicatorRepository = new PrismaIndicatorRepository(database);
+const favoriteRepository = new PrismaFavoriteRepository(database);
 
-const app = buildApp({}, { indicatorRepository });
+const app = buildApp(
+  {},
+  {
+    indicatorRepository,
+    favoriteRepository,
+  },
+);
 
 const syncScheduler = createIndicatorSyncScheduler({
   entries: [
