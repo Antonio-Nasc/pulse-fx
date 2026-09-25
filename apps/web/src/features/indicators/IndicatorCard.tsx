@@ -8,6 +8,9 @@ import type { IndicatorSummary } from './indicator-types';
 
 type IndicatorCardProps = {
   indicator: IndicatorSummary;
+  favorite: boolean;
+  favoriteDisabled: boolean;
+  onToggleFavorite: () => void;
 };
 
 const sourceLabels = {
@@ -17,6 +20,9 @@ const sourceLabels = {
 
 export function IndicatorCard({
   indicator,
+  favorite,
+  favoriteDisabled,
+  onToggleFavorite,
 }: IndicatorCardProps) {
   const changeTone = getChangeTone(indicator.changePercent);
 
@@ -27,15 +33,38 @@ export function IndicatorCard({
           {sourceLabels[indicator.source]}
         </span>
 
-        <span
-          className={
-            indicator.stale
-              ? 'indicator-card__status indicator-card__status--stale'
-              : 'indicator-card__status'
-          }
-        >
-          {indicator.stale ? 'Atualização pendente' : 'Atualizado'}
-        </span>
+        <div className="indicator-card__actions">
+          <span
+            className={
+              indicator.stale
+                ? 'indicator-card__status indicator-card__status--stale'
+                : 'indicator-card__status'
+            }
+          >
+            {indicator.stale ? 'Atualização pendente' : 'Atualizado'}
+          </span>
+
+          <button
+            className={
+              favorite
+                ? 'favorite-button favorite-button--active'
+                : 'favorite-button'
+            }
+            type="button"
+            aria-label={
+              favorite
+                ? `Remover ${indicator.name} dos favoritos`
+                : `Adicionar ${indicator.name} aos favoritos`
+            }
+            aria-pressed={favorite}
+            disabled={favoriteDisabled}
+            onClick={onToggleFavorite}
+          >
+            <span aria-hidden="true">
+              {favorite ? '★' : '☆'}
+            </span>
+          </button>
+        </div>
       </header>
 
       <div className="indicator-card__content">
@@ -48,7 +77,9 @@ export function IndicatorCard({
           <span>{indicator.unit}</span>
         </div>
 
-        <div className={`indicator-card__change indicator-card__change--${changeTone}`}>
+        <div
+          className={`indicator-card__change indicator-card__change--${changeTone}`}
+        >
           <strong>
             {formatChangePercent(indicator.changePercent)}
           </strong>
