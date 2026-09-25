@@ -1,18 +1,18 @@
-import type { PrismaClient } from '../../../generated/prisma/client.js';
+import type { PrismaClient } from "../../../generated/prisma/client.js";
 import type {
   IndicatorRepository,
   IndicatorSnapshot,
-} from '../application/indicator-repository.js';
+} from "../application/indicator-repository.js";
 
 export class PrismaIndicatorRepository implements IndicatorRepository {
   constructor(private readonly database: PrismaClient) {}
 
   async listSnapshots(): Promise<IndicatorSnapshot[]> {
     const indicators = await this.database.indicator.findMany({
-      orderBy: { slug: 'asc' },
+      orderBy: { slug: "asc" },
       include: {
         observations: {
-          orderBy: { referenceDate: 'desc' },
+          orderBy: { referenceDate: "desc" },
         },
       },
     });
@@ -23,6 +23,10 @@ export class PrismaIndicatorRepository implements IndicatorRepository {
       source: indicator.source,
       frequency: indicator.frequency,
       unit: indicator.unit,
+      description: indicator.description,
+      limitationText: indicator.limitationText,
+      sourceUrl: indicator.sourceUrl,
+      historyMonths: indicator.historyMonths,
       variationPolicy: {
         strategy: indicator.variationStrategy,
         periods: indicator.variationPeriods,

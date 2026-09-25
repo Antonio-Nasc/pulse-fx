@@ -3,7 +3,10 @@ import {
   selectComparisonObservations,
   type VariationPolicy,
 } from '../domain/select-comparison-observations.js';
-import type { IndicatorRepository } from './indicator-repository.js';
+import type {
+  IndicatorRepository,
+  IndicatorSnapshot,
+} from './indicator-repository.js';
 
 export type IndicatorSummary = {
   slug: string;
@@ -37,40 +40,47 @@ function getVariationLabel(policy: VariationPolicy): string {
   }
 }
 
+export function summarizeIndicator(
+  indicator: IndicatorSnapshot,
+  now: Date = new Date(),
+): IndicatorSummary {
+  const { latest, base } = selectComparisonObservations(
+    indicator.observations,
+    indicator.variationPolicy,
+  );
+
+  const ttlMilliseconds = indicator.ttlMinutes * 60_000;
+
+  const stale =
+    latest === null ||
+    indicator.lastSyncedAt === null ||
+    now.getTime() - indicator.lastSyncedAt.getTime() >= ttlMilliseconds;
+
+  return {
+    slug: indicator.slug,
+    name: indicator.name,
+    source: indicator.source,
+    frequency: indicator.frequency,
+    unit: indicator.unit,
+    latestValue: latest?.value ?? null,
+    referenceDate: latest?.referenceDate ?? null,
+    changePercent: calculateChangePercent(
+      latest?.value ?? null,
+      base?.value ?? null,
+    ),
+    variationLabel: getVariationLabel(indicator.variationPolicy),
+    lastSyncedAt: indicator.lastSyncedAt?.toISOString() ?? null,
+    stale,
+  };
+}
+
 export async function listIndicators(
   repository: IndicatorRepository,
   now: Date = new Date(),
 ): Promise<IndicatorSummary[]> {
   const indicators = await repository.listSnapshots();
 
-  return indicators.map((indicator) => {
-    const { latest, base } = selectComparisonObservations(
-      indicator.observations,
-      indicator.variationPolicy,
-    );
-
-    const ttlMilliseconds = indicator.ttlMinutes * 60_000;
-
-    const stale =
-      latest === null ||
-      indicator.lastSyncedAt === null ||
-      now.getTime() - indicator.lastSyncedAt.getTime() >= ttlMilliseconds;
-
-    return {
-      slug: indicator.slug,
-      name: indicator.name,
-      source: indicator.source,
-      frequency: indicator.frequency,
-      unit: indicator.unit,
-      latestValue: latest?.value ?? null,
-      referenceDate: latest?.referenceDate ?? null,
-      changePercent: calculateChangePercent(
-        latest?.value ?? null,
-        base?.value ?? null,
-      ),
-      variationLabel: getVariationLabel(indicator.variationPolicy),
-      lastSyncedAt: indicator.lastSyncedAt?.toISOString() ?? null,
-      stale,
-    };
-  });
+  return indicators.map((indicator) =>
+    summarizeIndicator(indicator, now),
+  );
 }
