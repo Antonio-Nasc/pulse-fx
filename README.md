@@ -14,6 +14,20 @@ MVP full stack para acompanhar câmbio e indicadores macroeconômicos a partir d
 - Ambiente completo com Docker Compose, migrations e seed versionados.
 - Pipeline de CI com lint, tipagem, testes, build e validação das imagens.
 
+## Demonstração
+
+### Dashboard
+
+![Dashboard do Pulse FX com os três indicadores](docs/screenshots/dashboard-header.png)
+
+![Cards de indicadores e filtro de favoritos](docs/screenshots/dashboard-indicators.png)
+
+### Detalhe do indicador
+
+![Resumo do Federal Funds Effective Rate](docs/screenshots/indicator-detail-summary.png)
+
+![Gráfico, observações e limitações do indicador](docs/screenshots/indicator-detail-history.png)
+
 ## Stack
 
 - **Web:** React 19, TypeScript e Vite.
