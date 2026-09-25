@@ -13,5 +13,11 @@
     "test": "pnpm -r --if-present test",
     "typecheck": "pnpm -r --if-present typecheck",
     "dev:api": "pnpm --filter @pulse-fx/api dev"
+  },
+  "pnpm": {
+    "overrides": {
+      "deepmerge-ts": "8.0.1",
+      "mysql2": "3.23.3"
+    }
   }
 }
